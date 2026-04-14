@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Calculator</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        .container { max-width: 400px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
+        .field { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        select { padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
+        .output-box { background: #f9f9f9; padding: 10px; border-left: 4px solid #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Shift Calculator</h2>
+
+    <div class="field">
+        <label>Reporting Time</label>
+        <select id="hour" onchange="calculateSignOut()">
+            </select>
+        :
+        <select id="minute" onchange="calculateSignOut()">
+            </select>
+    </div>
+
+    <hr>
+
+    <div class="field">
+        <label>Sign Out (+15 mins)</label>
+        <div id="signOutDisplay" class="output-box">12:15 AM</div>
+    </div>
+</div>
+
+<script>
+    const hourSelect = document.getElementById('hour');
+    const minuteSelect = document.getElementById('minute');
+    const output = document.getElementById('signOutDisplay');
+
+    // Initialize Hours (12-hour format)
+    for (let i = 1; i <= 12; i++) {
+        let opt = document.createElement('option');
+        opt.value = i;
+        opt.innerHTML = i;
+        hourSelect.appendChild(opt);
+    }
+
+    // Initialize Minutes (5-minute intervals)
+    for (let i = 0; i < 60; i += 5) {
+        let opt = document.createElement('option');
+        opt.value = i;
+        opt.innerHTML = i < 10 ? '0' + i : i;
+        minuteSelect.appendChild(opt);
+    }
+
+    function calculateSignOut() {
+        let h = parseInt(hourSelect.value);
+        let m = parseInt(minuteSelect.value);
+
+        // Add 15 minutes
+        m += 15;
+
+        // Handle overflow
+        if (m >= 60) {
+            m -= 60;
+            h += 1;
+        }
+        if (h > 12) {
+            h = 1; // Simple wrap-around logic
+        }
+
+        // Format and display
+        const displayM = m < 10 ? '0' + m : m;
+        output.innerText = h + ":" + displayM;
+    }
+
+    // Run once on load
+    calculateSignOut();
+</script>
+
+</body>
+</html>

@@ -3,83 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Calculator</title>
+    <title>Flight Reporting Tool</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
-        .container { max-width: 400px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
-        .field { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; }
-        select { padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
-        .output-box { background: #f9f9f9; padding: 10px; border-left: 4px solid #007bff; font-weight: bold; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; background-color: #f4f7f9; color: #333; }
+        .container { max-width: 450px; margin: auto; border: 1px solid #d1d9e0; padding: 25px; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        h2 { text-align: center; color: #0056b3; margin-top: 0; }
+        .field { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-row { display: flex; align-items: center; gap: 10px; }
+        select { padding: 12px; border-radius: 8px; border: 1px solid #ccd1d5; font-size: 1.1rem; width: 100%; background-color: #fff; }
+        .results-area { margin-top: 25px; display: grid; gap: 12px; }
+        .output-card { background: #ffffff; border: 1px solid #e1e4e8; padding: 12px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .output-label { font-weight: 600; color: #57606a; }
+        .output-time { font-family: monospace; font-size: 1.2rem; color: #0969da; font-weight: bold; }
+        .highlight { border-left: 4px solid #0969da; background: #f6f8fa; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>PTS Calculator</h2>
+    <h2>Flight Timing Tool</h2>
 
     <div class="field">
         <label>Reporting Time</label>
-        <select id="hour" onchange="calculateSignOut()">
-            </select>
-        :
-        <select id="minute" onchange="calculateSignOut()">
-            </select>
+        <div class="input-row">
+            <select id="hour" onchange="updateAllTimes()"></select>
+            <span style="font-weight: bold;">:</span>
+            <select id="minute" onchange="updateAllTimes()"></select>
+        </div>
     </div>
 
-    <hr>
-
-    <div class="field">
-        <label>Sign Out (+15 mins)</label>
-        <div id="signOutDisplay" class="output-box">12:15 AM</div>
+    <div class="results-area">
+        <div class="output-card">
+            <span class="output-label">Sign Out (+15)</span>
+            <span id="signOut" class="output-time">--:--</span>
+        </div>
+        <div class="output-card">
+            <span class="output-label">Crew on Board (+30)</span>
+            <span id="crewOnBoard" class="output-time">--:--</span>
+        </div>
+        <div class="output-card">
+            <span class="output-label">Boarding (+45)</span>
+            <span id="boarding" class="output-time">--:--</span>
+        </div>
+        <div class="output-card">
+            <span class="output-label">Door Close (+74)</span>
+            <span id="doorClose" class="output-time">--:--</span>
+        </div>
+        <div class="output-card highlight">
+            <span class="output-label">STD (+80)</span>
+            <span id="std" class="output-time">--:--</span>
+        </div>
     </div>
 </div>
 
 <script>
     const hourSelect = document.getElementById('hour');
     const minuteSelect = document.getElementById('minute');
-    const output = document.getElementById('signOutDisplay');
 
-    // Initialize Hours (12-hour format)
-    for (let i = 1; i <= 12; i++) {
+    // Populate Hours (00-23 for 24h format, or 1-12)
+    for (let i = 0; i <= 23; i++) {
         let opt = document.createElement('option');
-        opt.value = i;
-        opt.innerHTML = i;
+        let val = i < 10 ? '0' + i : i;
+        opt.value = i; opt.innerHTML = val;
         hourSelect.appendChild(opt);
     }
-
-    // Initialize Minutes (5-minute intervals)
+    // Populate Minutes (5-min intervals)
     for (let i = 0; i < 60; i += 5) {
         let opt = document.createElement('option');
-        opt.value = i;
-        opt.innerHTML = i < 10 ? '0' + i : i;
+        let val = i < 10 ? '0' + i : i;
+        opt.value = i; opt.innerHTML = val;
         minuteSelect.appendChild(opt);
     }
 
-    function calculateSignOut() {
-        let h = parseInt(hourSelect.value);
-        let m = parseInt(minuteSelect.value);
-
-        // Add 15 minutes
-        m += 15;
-
-        // Handle overflow
-        if (m >= 60) {
-            m -= 60;
-            h += 1;
-        }
-        if (h > 12) {
-            h = 1; // Simple wrap-around logic
-        }
-
-        // Format and display
-        const displayM = m < 10 ? '0' + m : m;
-        output.innerText = h + ":" + displayM;
-    }
-
-    // Run once on load
-    calculateSignOut();
-</script>
-
-</body>
-</html>
+    function addMinutes(h, m, addM) {
+        let date = new Date();
+        date.setHours(h);
+        date.setMinutes(m + addM);
+        
+        let finalH = date.getHours();
+        let finalM = date.getMinutes();
+        
+        return (finalH < 10

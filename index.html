@@ -3,85 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Reporting Tool</title>
+    <title>PTS Calculation</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; background-color: #f4f7f9; color: #333; }
-        .container { max-width: 450px; margin: auto; border: 1px solid #d1d9e0; padding: 25px; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        h2 { text-align: center; color: #0056b3; margin-top: 0; }
-        .field { margin-bottom: 20px; }
-        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .input-row { display: flex; align-items: center; gap: 10px; }
-        select { padding: 12px; border-radius: 8px; border: 1px solid #ccd1d5; font-size: 1.1rem; width: 100%; background-color: #fff; }
-        .results-area { margin-top: 25px; display: grid; gap: 12px; }
-        .output-card { background: #ffffff; border: 1px solid #e1e4e8; padding: 12px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .output-label { font-weight: 600; color: #57606a; }
-        .output-time { font-family: monospace; font-size: 1.2rem; color: #0969da; font-weight: bold; }
-        .highlight { border-left: 4px solid #0969da; background: #f6f8fa; }
+        body { font-family: -apple-system, system-ui, sans-serif; padding: 20px; background-color: #f4f7f9; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #0056b3; margin-bottom: 25px; }
+        .input-section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e9ecef; }
+        label { display: block; font-weight: bold; margin-bottom: 10px; font-size: 0.9rem; color: #495057; }
+        .select-wrapper { display: flex; align-items: center; gap: 10px; }
+        select { flex: 1; padding: 12px; border-radius: 8px; border: 2px solid #dee2e6; font-size: 1.1rem; appearance: none; background-color: white; }
+        .output-list { display: flex; flex-direction: column; gap: 10px; }
+        .output-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #fff; border: 1px solid #edf2f7; border-radius: 8px; }
+        .label-text { font-size: 0.95rem; font-weight: 500; color: #718096; }
+        .time-text { font-family: monospace; font-size: 1.15rem; font-weight: 700; color: #2d3748; }
+        .highlight { background: #ebf8ff; border-left: 4px solid #3182ce; }
+        .highlight .time-text { color: #2b6cb0; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Flight Timing Tool</h2>
+    <h2>Reporting Tool</h2>
 
-    <div class="field">
-        <label>Reporting Time</label>
-        <div class="input-row">
-            <select id="hour" onchange="updateAllTimes()"></select>
-            <span style="font-weight: bold;">:</span>
-            <select id="minute" onchange="updateAllTimes()"></select>
+    <div class="input-section">
+        <label>REPORTING TIME (HH:MM)</label>
+        <div class="select-wrapper">
+            <select id="hourSelect"></select>
+            <span>:</span>
+            <select id="minSelect"></select>
         </div>
     </div>
 
-    <div class="results-area">
-        <div class="output-card">
-            <span class="output-label">Sign Out (+15)</span>
-            <span id="signOut" class="output-time">--:--</span>
-        </div>
-        <div class="output-card">
-            <span class="output-label">Crew on Board (+30)</span>
-            <span id="crewOnBoard" class="output-time">--:--</span>
-        </div>
-        <div class="output-card">
-            <span class="output-label">Boarding (+45)</span>
-            <span id="boarding" class="output-time">--:--</span>
-        </div>
-        <div class="output-card">
-            <span class="output-label">Door Close (+74)</span>
-            <span id="doorClose" class="output-time">--:--</span>
-        </div>
-        <div class="output-card highlight">
-            <span class="output-label">STD (+80)</span>
-            <span id="std" class="output-time">--:--</span>
-        </div>
+    <div class="output-list">
+        <div class="output-item"><span class="label-text">Sign Out (+15)</span> <span id="out15" class="time-text">00:00</span></div>
+        <div class="output-item"><span class="label-text">Crew on Board (+30)</span> <span id="out30" class="time-text">00:00</span></div>
+        <div class="output-item"><span class="label-text">Boarding (+45)</span> <span id="out45" class="time-text">00:00</span></div>
+        <div class="output-item"><span class="label-text">Door Close (+74)</span> <span id="out74" class="time-text">00:00</span></div>
+        <div class="output-item highlight"><span class="label-text">STD (+80)</span> <span id="out80" class="time-text">00:00</span></div>
     </div>
 </div>
 
 <script>
-    const hourSelect = document.getElementById('hour');
-    const minuteSelect = document.getElementById('minute');
+    const hDrop = document.getElementById('hourSelect');
+    const mDrop = document.getElementById('minSelect');
 
-    // Populate Hours (00-23 for 24h format, or 1-12)
-    for (let i = 0; i <= 23; i++) {
-        let opt = document.createElement('option');
-        let val = i < 10 ? '0' + i : i;
-        opt.value = i; opt.innerHTML = val;
-        hourSelect.appendChild(opt);
-    }
-    // Populate Minutes (5-min intervals)
-    for (let i = 0; i < 60; i += 5) {
-        let opt = document.createElement('option');
-        let val = i < 10 ? '0' + i : i;
-        opt.value = i; opt.innerHTML = val;
-        minuteSelect.appendChild(opt);
+    // 1. Populate Dropdowns (Immediate execution)
+    function setup() {
+        for (let i = 0; i < 24; i++) {
+            let opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = i.toString().padStart(2, '0');
+            hDrop.appendChild(opt);
+        }
+        for (let i = 0; i < 60; i += 5) {
+            let opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = i.toString().padStart(2, '0');
+            mDrop.appendChild(opt);
+        }
     }
 
-    function addMinutes(h, m, addM) {
-        let date = new Date();
-        date.setHours(h);
-        date.setMinutes(m + addM);
-        
-        let finalH = date.getHours();
-        let finalM = date.getMinutes();
-        
-        return (finalH < 10
+    // 2. Calculation Logic
+    function calculate() {
+        const h = parseInt(hDrop.value);
+        const m = parseInt(mDrop.value);
+
+        const updateField = (id, offset) => {
+            let date = new Date();
+            date.setHours(h, m + offset, 0);
+            const displayH = date.getHours().toString().padStart(2, '0');
+            const displayM = date.getMinutes().toString().padStart(2, '0');
+            document.getElementById(id).textContent = `${displayH}:${displayM}`;
+        };
+
+        updateField('out15', 15);
+        updateField('out30', 30);
+        updateField('out45', 45);
+        updateField('out74', 74);
+        updateField('out80', 80);
+    }
+
+    // 3. Event Listeners
+    hDrop.addEventListener('change', calculate);
+    mDrop.addEventListener('change', calculate);
+
+    // Initial Run
+    setup();
+    calculate();
+</script>
+
+</body>
+</html>

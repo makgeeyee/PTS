@@ -8,14 +8,11 @@
         body { font-family: -apple-system, system-ui, sans-serif; padding: 20px; background-color: #f4f7f9; }
         .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         h3 { text-align: center; color: #0056b3; margin: 10px 0 20px; }
-        
-        /* Tab 樣式 */
         .tabs { display: flex; gap: 5px; margin-bottom: 20px; }
         .tab-btn { flex: 1; padding: 10px; cursor: pointer; border: none; background: #e2e8f0; border-radius: 8px; font-weight: bold; }
         .tab-btn.active { background: #0056b3; color: white; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
         .input-section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e9ecef; }
         label { display: block; font-weight: bold; margin-bottom: 10px; font-size: 0.7rem; color: #495057; }
         .select-wrapper { display: flex; align-items: center; gap: 10px; }
@@ -38,10 +35,10 @@
         <button class="tab-btn" onclick="openTab(event, 'tabWide')">Wide Body</button>
     </div>
 
-    <!-- 內容區 -->
+    <!-- 320 Tab -->
     <div id="tab320" class="tab-content active">
         <div class="input-section">
-            <label>REPORTING TIME (320)</label>
+            <label>REPORTING TIME (HH:MM)</label>
             <div class="select-wrapper">
                 <select class="hourSelect" onchange="calculate()"></select>
                 <span>:</span>
@@ -51,9 +48,10 @@
         <div class="output-list" id="list320"></div>
     </div>
 
+    <!-- Wide Body Tab -->
     <div id="tabWide" class="tab-content">
         <div class="input-section">
-            <label>REPORTING TIME (WIDE)</label>
+            <label>REPORTING TIME (HH:MM)</label>
             <div class="select-wrapper">
                 <select class="hourSelect" onchange="calculate()"></select>
                 <span>:</span>
@@ -65,10 +63,22 @@
 </div>
 
 <script>
-    // 設定每個 tab 嘅減數邏輯
+    // 喺呢度改返你想加嘅分鐘數 (例如: 15, 30, 45, 74, 80)
     const configs = {
-        'tab320': [70, 55, 47, 40, 6, 0],
-        'tabWide': [70, 55, 47, 40, 6, 0] // 你可以隨時喺度改數值
+        'tab320': [
+            { label: 'Sign Out (+15)', offset: 15 },
+            { label: 'Crew on Board (+30)', offset: 30 },
+            { label: 'Boarding (+45)', offset: 45 },
+            { label: 'Door Close (+74)', offset: 74 },
+            { label: 'STD (+80)', offset: 80 }
+        ],
+        'tabWide': [
+            { label: 'Sign Out (+15)', offset: 15 },
+            { label: 'Crew on Board (+30)', offset: 30 },
+            { label: 'Boarding (+45)', offset: 45 },
+            { label: 'Door Close (+74)', offset: 74 },
+            { label: 'STD (+80)', offset: 80 }
+        ]
     };
 
     function openTab(evt, tabName) {
@@ -95,14 +105,12 @@
             }
         });
 
-        // 初始化每個 tab 嘅 output list
         ['tab320', 'tabWide'].forEach(id => {
             const list = document.getElementById(id).querySelector('.output-list');
-            configs[id].forEach(offset => {
-                const label = offset === 0 ? "STD" : `Time (-${offset})`;
+            configs[id].forEach(itemData => {
                 const item = document.createElement('div');
-                item.className = `output-item ${offset === 0 ? 'highlight' : ''}`;
-                item.innerHTML = `<span class="label-text">${label}</span> <span class="time-text" id="${id}-${offset}">00:00</span>`;
+                item.className = `output-item ${itemData.offset === 80 ? 'highlight' : ''}`;
+                item.innerHTML = `<span class="label-text">${itemData.label}</span> <span class="time-text" id="${id}-${itemData.offset}">00:00</span>`;
                 list.appendChild(item);
             });
         });
@@ -114,11 +122,12 @@
         const m = parseInt(activeTab.querySelector('.minSelect').value);
         const id = activeTab.id;
 
-        configs[id].forEach(offset => {
+        configs[id].forEach(itemData => {
             let date = new Date();
-            date.setHours(h, m - offset, 0);
+            // 改返做加法
+            date.setHours(h, m + itemData.offset, 0); 
             const timeStr = date.getHours().toString().padStart(2, '0') + ":" + date.getMinutes().toString().padStart(2, '0');
-            document.getElementById(`${id}-${offset}`).textContent = timeStr;
+            document.getElementById(`${id}-${itemData.offset}`).textContent = timeStr;
         });
     }
 

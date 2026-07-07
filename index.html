@@ -7,24 +7,27 @@
     <style>
         body { font-family: -apple-system, system-ui, sans-serif; padding: 20px; background-color: #f4f7f9; }
         .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        /* 標題改為 #00645A */
         h3 { text-align: center; color: #00645A; margin: 10px 0 20px; }
         .tabs { display: flex; gap: 5px; margin-bottom: 20px; }
         .tab-btn { flex: 1; padding: 10px; cursor: pointer; background: #DCD3BC; border: none; border-radius: 8px; font-weight: bold; color: #495057; }
-        /* Active Tab 背景同字色 */
         .tab-btn.active { background: #00645A; color: #FFFFFF; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .input-section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e9ecef; }
-        /* Reporting Time Label */
         label { display: block; font-weight: bold; margin-bottom: 10px; font-size: 0.7rem; color: #00645A; }
         .select-wrapper { display: flex; align-items: center; gap: 10px; }
-        select { flex: 1; padding: 12px; border-radius: 8px; border: 2px solid #dee2e6; font-size: 0.9rem; appearance: none; background-color: white; }
+        
+        /* 呢度改咗 select 樣式，解決 iOS 藍色字問題 */
+        select { 
+            flex: 1; padding: 12px; border-radius: 8px; border: 2px solid #dee2e6; 
+            font-size: 0.9rem; appearance: none; background-color: white; 
+            color: #00645A; font-weight: bold; /* 強制設定文字顏色為綠色 */
+        }
+        
         .output-list { display: flex; flex-direction: column; gap: 10px; }
         .output-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #fff; border: 1px solid #edf2f7; border-radius: 8px; }
         .label-text { font-size: 0.7rem; font-weight: 500; color: #718096; }
-        .time-text { font-family: monospace; font-size: 1.1rem; font-weight: 700; color: #2d3748; }
-        /* Highlight 邊框同字色改為 #00645A */
+        .time-text { font-family: monospace; font-size: 1.1rem; font-weight: 700; color: #00645A; }
         .highlight { background: #f8f9fa; border-left: 4px solid #00645A; }
         .highlight .time-text { color: #00645A; }
     </style>

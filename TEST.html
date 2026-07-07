@@ -60,7 +60,7 @@
         <div class="input-section">
             <label>REPORTING TIME (HH:MM)</label>
             <div class="select-wrapper">
-                <select id="hWide" onchange="calcWide()"></select>
+                <select id="hWide" onchange="calcWide()"></center>
                 <span>:</span>
                 <select id="mWide" onchange="calcWide()"></select>
             </div>
@@ -68,8 +68,8 @@
         <div class="output-list">
             <div class="output-item"><span class="label-text">Sign Out (-70)</span> <span id="outWide-15" class="time-text">00:00</span></div>
             <div class="output-item"><span class="label-text">Crew on Board (-55)</span> <span id="outWide-30" class="time-text">00:00</span></div>
-            <div class="output-item"><span class="label-text">Security Checks by (-43)</span> <span id="outWide-38" class="time-text">00:00</span></div>
-            <div class="output-item"><span class="label-text">Boarding (-35)</span> <span id="outWide-45" class="time-text">00:00</span></div>
+            <div class="output-item"><span class="label-text">Security Checks by (-42)</span> <span id="outWide-43" class="time-text">00:00</span></div>
+            <div class="output-item"><span class="label-text">Boarding (-35)</span> <span id="outWide-50" class="time-text">00:00</span></div>
             <div class="output-item"><span class="label-text">Door Close (-6)</span> <span id="outWide-79" class="time-text">00:00</span></div>
             <div class="output-item highlight"><span class="label-text">STD</span> <span id="outWide-85" class="time-text">00:00</span></div>
         </div>
@@ -89,29 +89,28 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.getElementById(id === 'tab320' ? 'btn320' : 'btnWide').classList.add('active');
+        id === 'tab320' ? calc320() : calcWide();
     }
 
     function calc320() {
         const h = parseInt(document.getElementById('h320').value);
         const m = parseInt(document.getElementById('m320').value);
-        const offsets = [15, 30, 38, 45, 79, 85];
-        offsets.forEach(off => {
-            let d = new Date();
-            d.setHours(h, m + off, 0);
-            document.getElementById('out320-'+off).textContent = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
-        });
+        const map = { 15: 15, 30: 30, 38: 38, 45: 45, 79: 79, 85: 85 };
+        for (let key in map) {
+            let d = new Date(); d.setHours(h, m + map[key], 0);
+            document.getElementById('out320-'+key).textContent = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
+        }
     }
 
     function calcWide() {
-        // 喺度改 Wide Body 嘅邏輯，例如將 offset 改成你想要嘅數值
         const h = parseInt(document.getElementById('hWide').value);
         const m = parseInt(document.getElementById('mWide').value);
-        const offsets = [15, 30, 43, 50, 79, 85]; 
-        offsets.forEach(off => {
-            let d = new Date();
-            d.setHours(h, m + off, 0);
-            document.getElementById('outWide-'+off).textContent = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
-        });
+        // Wide Body 嘅計法 (Security +43, Boarding +50)
+        const map = { 15: 15, 30: 30, 43: 43, 50: 50, 79: 79, 85: 85 };
+        for (let key in map) {
+            let d = new Date(); d.setHours(h, m + map[key], 0);
+            document.getElementById('outWide-'+key).textContent = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
+        }
     }
 
     setup();

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTS Calculator (HKG)</title>
+    <style>
+        body { font-family: -apple-system, system-ui, sans-serif; padding: 20px; background-color: #f4f7f9; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h3 { text-align: center; color: #0056b3; margin: 10px 0 20px; }
+        
+        /* Tab 樣式 */
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 10px; cursor: pointer; border: none; background: #e2e8f0; border-radius: 8px; font-weight: bold; }
+        .tab-btn.active { background: #0056b3; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .input-section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e9ecef; }
+        label { display: block; font-weight: bold; margin-bottom: 10px; font-size: 0.7rem; color: #495057; }
+        .select-wrapper { display: flex; align-items: center; gap: 10px; }
+        select { flex: 1; padding: 12px; border-radius: 8px; border: 2px solid #dee2e6; font-size: 0.9rem; appearance: none; background-color: white; }
+        .output-list { display: flex; flex-direction: column; gap: 10px; }
+        .output-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #fff; border: 1px solid #edf2f7; border-radius: 8px; }
+        .label-text { font-size: 0.7rem; font-weight: 500; color: #718096; }
+        .time-text { font-family: monospace; font-size: 1.1rem; font-weight: 700; color: #2d3748; }
+        .highlight { background: #ebf8ff; border-left: 4px solid #3182ce; }
+        .highlight .time-text { color: #2b6cb0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h3>PTS Calculator (HKG)</h3>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'tab320')">320</button>
+        <button class="tab-btn" onclick="openTab(event, 'tabWide')">Wide Body</button>
+    </div>
+
+    <!-- 內容區 -->
+    <div id="tab320" class="tab-content active">
+        <div class="input-section">
+            <label>REPORTING TIME (320)</label>
+            <div class="select-wrapper">
+                <select class="hourSelect" onchange="calculate()"></select>
+                <span>:</span>
+                <select class="minSelect" onchange="calculate()"></select>
+            </div>
+        </div>
+        <div class="output-list" id="list320"></div>
+    </div>
+
+    <div id="tabWide" class="tab-content">
+        <div class="input-section">
+            <label>REPORTING TIME (WIDE)</label>
+            <div class="select-wrapper">
+                <select class="hourSelect" onchange="calculate()"></select>
+                <span>:</span>
+                <select class="minSelect" onchange="calculate()"></select>
+            </div>
+        </div>
+        <div class="output-list" id="listWide"></div>
+    </div>
+</div>
+
+<script>
+    // 設定每個 tab 嘅減數邏輯
+    const configs = {
+        'tab320': [70, 55, 47, 40, 6, 0],
+        'tabWide': [70, 55, 47, 40, 6, 0] // 你可以隨時喺度改數值
+    };
+
+    function openTab(evt, tabName) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        evt.currentTarget.classList.add('active');
+        calculate();
+    }
+
+    function setup() {
+        document.querySelectorAll('.hourSelect').forEach(s => {
+            for (let i = 0; i < 24; i++) {
+                let opt = document.createElement('option');
+                opt.value = i; opt.textContent = i.toString().padStart(2, '0');
+                s.appendChild(opt);
+            }
+        });
+        document.querySelectorAll('.minSelect').forEach(s => {
+            for (let i = 0; i < 60; i += 5) {
+                let opt = document.createElement('option');
+                opt.value = i; opt.textContent = i.toString().padStart(2, '0');
+                s.appendChild(opt);
+            }
+        });
+
+        // 初始化每個 tab 嘅 output list
+        ['tab320', 'tabWide'].forEach(id => {
+            const list = document.getElementById(id).querySelector('.output-list');
+            configs[id].forEach(offset => {
+                const label = offset === 0 ? "STD" : `Time (-${offset})`;
+                const item = document.createElement('div');
+                item.className = `output-item ${offset === 0 ? 'highlight' : ''}`;
+                item.innerHTML = `<span class="label-text">${label}</span> <span class="time-text" id="${id}-${offset}">00:00</span>`;
+                list.appendChild(item);
+            });
+        });
+    }
+
+    function calculate() {
+        const activeTab = document.querySelector('.tab-content.active');
+        const h = parseInt(activeTab.querySelector('.hourSelect').value);
+        const m = parseInt(activeTab.querySelector('.minSelect').value);
+        const id = activeTab.id;
+
+        configs[id].forEach(offset => {
+            let date = new Date();
+            date.setHours(h, m - offset, 0);
+            const timeStr = date.getHours().toString().padStart(2, '0') + ":" + date.getMinutes().toString().padStart(2, '0');
+            document.getElementById(`${id}-${offset}`).textContent = timeStr;
+        });
+    }
+
+    setup();
+    calculate();
+</script>
+
+</body>
+</html>

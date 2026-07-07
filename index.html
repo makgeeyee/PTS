@@ -3,96 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PTS Calculation 32Q</title>
+    <title>PTS Calculator (HKG)</title>
     <style>
         body { font-family: -apple-system, system-ui, sans-serif; padding: 20px; background-color: #f4f7f9; }
         .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h3 { text-align: center; color: #0056b3; margin-bottom: 25px; }
+        /* 標題改為 #00645A */
+        h3 { text-align: center; color: #00645A; margin: 10px 0 20px; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 10px; cursor: pointer; background: #DCD3BC; border: none; border-radius: 8px; font-weight: bold; color: #495057; }
+        /* Active Tab 背景同字色 */
+        .tab-btn.active { background: #00645A; color: #FFFFFF; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
         .input-section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e9ecef; }
-        label { display: block; font-weight: bold; margin-bottom: 10px; font-size: 0.7rem; color: #495057; }
+        /* Reporting Time Label */
+        label { display: block; font-weight: bold; margin-bottom: 10px; font-size: 0.7rem; color: #00645A; }
         .select-wrapper { display: flex; align-items: center; gap: 10px; }
         select { flex: 1; padding: 12px; border-radius: 8px; border: 2px solid #dee2e6; font-size: 0.9rem; appearance: none; background-color: white; }
         .output-list { display: flex; flex-direction: column; gap: 10px; }
         .output-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #fff; border: 1px solid #edf2f7; border-radius: 8px; }
         .label-text { font-size: 0.7rem; font-weight: 500; color: #718096; }
         .time-text { font-family: monospace; font-size: 1.1rem; font-weight: 700; color: #2d3748; }
-        .highlight { background: #ebf8ff; border-left: 4px solid #3182ce; }
-        .highlight .time-text { color: #2b6cb0; }
+        /* Highlight 邊框同字色改為 #00645A */
+        .highlight { background: #f8f9fa; border-left: 4px solid #00645A; }
+        .highlight .time-text { color: #00645A; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h3>PTS Tool 32Q</h3>
+    <h3>PTS Calculator (HKG)</h3>
+    
+    <div class="tabs">
+        <button class="tab-btn active" id="btn320" onclick="switchTab('tab320')">320</button>
+        <button class="tab-btn" id="btnWide" onclick="switchTab('tabWide')">Wide Body</button>
+    </div>
 
-    <div class="input-section">
-        <label>REPORTING TIME (HH:MM)</label>
-        <div class="select-wrapper">
-            <select id="hourSelect"></select>
-            <span>:</span>
-            <select id="minSelect"></select>
+    <!-- 320 Tab -->
+    <div id="tab320" class="tab-content active">
+        <div class="input-section">
+            <label>REPORTING TIME (HH:MM)</label>
+            <div class="select-wrapper">
+                <select id="h320" onchange="calc320()"></select>
+                <span>:</span>
+                <select id="m320" onchange="calc320()"></select>
+            </div>
+        </div>
+        <div class="output-list">
+            <div class="output-item"><span class="label-text">Sign Out (-70)</span> <span id="out320-15" class="time-text">00:00</span></div>
+            <div class="output-item"><span class="label-text">Crew on Board (-55)</span> <span id="out320-30" class="time-text">00:00</span></div>
+            <div class="output-item"><span class="label-text">Security Checks by (-47)</span> <span id="out320-38" class="time-text">00:00</span></div>
+            <div class="output-item"><span class="label-text">Boarding (-40)</span> <span id="out320-45" class="time-text">00:00</span></div>
+            <div class="output-item"><span class="label-text">Door Close (-6)</span> <span id="out320-79" class="time-text">00:00</span></div>
+            <div class="output-item highlight"><span class="label-text">STD</span> <span id="out320-85" class="time-text">00:00</span></div>
         </div>
     </div>
 
-    <div class="output-list">
-        <div class="output-item"><span class="label-text">Sign Out (-70)</span> <span id="out15" class="time-text">00:00</span></div>
-        <div class="output-item"><span class="label-text">Crew on Board (-55)</span> <span id="out30" class="time-text">00:00</span></div>
-         <div class="output-item"><span class="label-text">Security Checks by (-47)</span> <span id="out38" class="time-text">00:00</span></div>
-        <div class="output-item"><span class="label-text">Boarding (-40)</span> <span id="out45" class="time-text">00:00</span></div>
-        <div class="output-item"><span class="label-text">Door Close (-6)</span> <span id="out79" class="time-text">00:00</span></div>
-        <div class="output-item highlight"><span class="label-text">STD</span> <span id="out85" class="time-text">00:00</span></div>
+    <!-- Wide Body Tab -->
+    <div id="tabWide" class="tab-content">
+        <div class="input-section">
+            <label>REPORTING TIME (HH:MM)</label>
+            <div class="select-wrapper">
+                <select id="hWide" onchange="calcWide()"></select>
+                <span>:</span>
+                <select id="mWide" onchange="calcWide()"></select>
+            </div>
+        </div>
+        <div class="output-list">
+            <div class="output-item"><span class="label-text">Sign Out (-70)</span> <span id="outWide-15" class="time-text">00:00</span></div>
+            <div class="output-item"><span class="label-text">Crew on Board (-55)</span> <span id="outWide-30" class="time-text">00:00</span></div>
+            <div class="output-item"><span class="label-text">Security Checks by (-42)</span> <span id="outWide-43" class="time-text">00:00</span></div>
+            <div class="output-item"><span class="label-text">Boarding (-35)</span> <span id="outWide-50" class="time-text">00:00</span></div>
+            <div class="output-item"><span class="label-text">Door Close (-6)</span> <span id="outWide-79" class="time-text">00:00</span></div>
+            <div class="output-item highlight"><span class="label-text">STD</span> <span id="outWide-85" class="time-text">00:00</span></div>
+        </div>
     </div>
 </div>
 
 <script>
-    const hDrop = document.getElementById('hourSelect');
-    const mDrop = document.getElementById('minSelect');
-
-    // 1. Populate Dropdowns (Immediate execution)
     function setup() {
-        for (let i = 0; i < 24; i++) {
-            let opt = document.createElement('option');
-            opt.value = i;
-            opt.textContent = i.toString().padStart(2, '0');
-            hDrop.appendChild(opt);
-        }
-        for (let i = 0; i < 60; i += 5) {
-            let opt = document.createElement('option');
-            opt.value = i;
-            opt.textContent = i.toString().padStart(2, '0');
-            mDrop.appendChild(opt);
+        const hs = [document.getElementById('h320'), document.getElementById('hWide')];
+        const ms = [document.getElementById('m320'), document.getElementById('mWide')];
+        hs.forEach(s => { for(let i=0; i<24; i++) s.innerHTML += `<option value="${i}">${i.toString().padStart(2,'0')}</option>`; });
+        ms.forEach(s => { for(let i=0; i<60; i+=5) s.innerHTML += `<option value="${i}">${i.toString().padStart(2,'0')}</option>`; });
+    }
+
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById(id === 'tab320' ? 'btn320' : 'btnWide').classList.add('active');
+        id === 'tab320' ? calc320() : calcWide();
+    }
+
+    function calc320() {
+        const h = parseInt(document.getElementById('h320').value);
+        const m = parseInt(document.getElementById('m320').value);
+        const map = { 15: 15, 30: 30, 38: 38, 45: 45, 79: 79, 85: 85 };
+        for (let key in map) {
+            let d = new Date(); d.setHours(h, m + map[key], 0);
+            document.getElementById('out320-'+key).textContent = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
         }
     }
 
-    // 2. Calculation Logic
-    function calculate() {
-        const h = parseInt(hDrop.value);
-        const m = parseInt(mDrop.value);
-
-        const updateField = (id, offset) => {
-            let date = new Date();
-            date.setHours(h, m + offset, 0);
-            const displayH = date.getHours().toString().padStart(2, '0');
-            const displayM = date.getMinutes().toString().padStart(2, '0');
-            document.getElementById(id).textContent = `${displayH}:${displayM}`;
-        };
-
-        updateField('out15', 15);
-        updateField('out30', 30);
-        updateField('out38', 38);
-        updateField('out45', 45);
-        updateField('out79', 79);
-        updateField('out85', 85);
+    function calcWide() {
+        const h = parseInt(document.getElementById('hWide').value);
+        const m = parseInt(document.getElementById('mWide').value);
+        const map = { 15: 15, 30: 30, 43: 43, 50: 50, 79: 79, 85: 85 };
+        for (let key in map) {
+            let d = new Date(); d.setHours(h, m + map[key], 0);
+            document.getElementById('outWide-'+key).textContent = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
+        }
     }
 
-    // 3. Event Listeners
-    hDrop.addEventListener('change', calculate);
-    mDrop.addEventListener('change', calculate);
-
-    // Initial Run
     setup();
-    calculate();
+    calc320();
+    calcWide();
 </script>
-
 </body>
 </html>

@@ -9,12 +9,14 @@
         .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         h3 { text-align: center; color: #00645A; margin: 10px 0 20px; }
         .tabs { display: flex; gap: 5px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 10px; cursor: pointer; background: #DCD3BC; border: none; border-radius: 8px; font-weight: bold; }
-        .tab-btn.active { background: #00645A; color: white; }
+        .tab-btn { flex: 1; padding: 10px; cursor: pointer; background: #DCD3BC; border: none; border-radius: 8px; font-weight: bold; color: #495057; }
+        /* Active Tab 文字改為白色 */
+        .tab-btn.active { background: #00645A; color: #FFFFFF; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .input-section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e9ecef; }
-        label { display: block; font-weight: bold; margin-bottom: 10px; font-size: 0.7rem; color: #495057; }
+        /* Reporting Time Label 文字改為 #00645A */
+        label { display: block; font-weight: bold; margin-bottom: 10px; font-size: 0.7rem; color: #00645A; }
         .select-wrapper { display: flex; align-items: center; gap: 10px; }
         select { flex: 1; padding: 12px; border-radius: 8px; border: 2px solid #dee2e6; font-size: 0.9rem; appearance: none; background-color: white; }
         .output-list { display: flex; flex-direction: column; gap: 10px; }
@@ -105,7 +107,6 @@
     function calcWide() {
         const h = parseInt(document.getElementById('hWide').value);
         const m = parseInt(document.getElementById('mWide').value);
-        // Wide Body 邏輯: 15, 30, 43, 50, 79, 85
         const map = { 15: 15, 30: 30, 43: 43, 50: 50, 79: 79, 85: 85 };
         for (let key in map) {
             let d = new Date(); d.setHours(h, m + map[key], 0);

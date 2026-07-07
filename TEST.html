@@ -35,7 +35,7 @@
         <button class="tab-btn" onclick="openTab(event, 'tabWide')">Wide Body</button>
     </div>
 
-    <!-- 320 Tab -->
+    <!-- 內容區: 兩個 Tab 結構一樣 -->
     <div id="tab320" class="tab-content active">
         <div class="input-section">
             <label>REPORTING TIME (HH:MM)</label>
@@ -48,7 +48,6 @@
         <div class="output-list" id="list320"></div>
     </div>
 
-    <!-- Wide Body Tab -->
     <div id="tabWide" class="tab-content">
         <div class="input-section">
             <label>REPORTING TIME (HH:MM)</label>
@@ -63,23 +62,15 @@
 </div>
 
 <script>
-    // 喺呢度改返你想加嘅分鐘數 (例如: 15, 30, 45, 74, 80)
-    const configs = {
-        'tab320': [
-            { label: 'Sign Out (+15)', offset: 15 },
-            { label: 'Crew on Board (+30)', offset: 30 },
-            { label: 'Boarding (+45)', offset: 45 },
-            { label: 'Door Close (+74)', offset: 74 },
-            { label: 'STD (+80)', offset: 80 }
-        ],
-        'tabWide': [
-            { label: 'Sign Out (+15)', offset: 15 },
-            { label: 'Crew on Board (+30)', offset: 30 },
-            { label: 'Boarding (+45)', offset: 45 },
-            { label: 'Door Close (+74)', offset: 74 },
-            { label: 'STD (+80)', offset: 80 }
-        ]
-    };
+    // 嚴格跟隨你俾我嘅邏輯與 label
+    const items = [
+        { id: 'out15', label: 'Sign Out (-70)', offset: 15 },
+        { id: 'out30', label: 'Crew on Board (-55)', offset: 30 },
+        { id: 'out38', label: 'Security Checks by (-47)', offset: 38 },
+        { id: 'out45', label: 'Boarding (-40)', offset: 45 },
+        { id: 'out79', label: 'Door Close (-6)', offset: 79 },
+        { id: 'out85', label: 'STD', offset: 85 }
+    ];
 
     function openTab(evt, tabName) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -105,13 +96,14 @@
             }
         });
 
-        ['tab320', 'tabWide'].forEach(id => {
-            const list = document.getElementById(id).querySelector('.output-list');
-            configs[id].forEach(itemData => {
-                const item = document.createElement('div');
-                item.className = `output-item ${itemData.offset === 80 ? 'highlight' : ''}`;
-                item.innerHTML = `<span class="label-text">${itemData.label}</span> <span class="time-text" id="${id}-${itemData.offset}">00:00</span>`;
-                list.appendChild(item);
+        // 幫兩個 Tab 生成列表
+        ['tab320', 'tabWide'].forEach(tabId => {
+            const list = document.getElementById(tabId).querySelector('.output-list');
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `output-item ${item.offset === 85 ? 'highlight' : ''}`;
+                div.innerHTML = `<span class="label-text">${item.label}</span> <span class="time-text" id="${tabId}-${item.id}">00:00</span>`;
+                list.appendChild(div);
             });
         });
     }
@@ -120,14 +112,15 @@
         const activeTab = document.querySelector('.tab-content.active');
         const h = parseInt(activeTab.querySelector('.hourSelect').value);
         const m = parseInt(activeTab.querySelector('.minSelect').value);
-        const id = activeTab.id;
+        const tabId = activeTab.id;
 
-        configs[id].forEach(itemData => {
+        items.forEach(item => {
             let date = new Date();
-            // 改返做加法
-            date.setHours(h, m + itemData.offset, 0); 
-            const timeStr = date.getHours().toString().padStart(2, '0') + ":" + date.getMinutes().toString().padStart(2, '0');
-            document.getElementById(`${id}-${itemData.offset}`).textContent = timeStr;
+            // 完美保留你原來嘅加法邏輯
+            date.setHours(h, m + item.offset, 0); 
+            const displayH = date.getHours().toString().padStart(2, '0');
+            const displayM = date.getMinutes().toString().padStart(2, '0');
+            document.getElementById(`${tabId}-${item.id}`).textContent = `${displayH}:${displayM}`;
         });
     }
 
